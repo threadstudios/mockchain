@@ -33,7 +33,7 @@ class BlockChain {
                 reject('Invalid index');
             } else if (prev.hash !== next.previousHash) {
                 reject('Invalid previous hash')
-            } else if (calculateHashForBlock(next) !== newBlock.hash) {
+            } else if (calculateHashForBlock(next) !== next.hash) {
                 reject('Hash is invalid')
             } else {
                 resolve(next)
