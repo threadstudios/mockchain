@@ -33,6 +33,12 @@
                 console.log(data);
                 document.querySelector('.result').innerText += JSON.stringify(data, null, 2);
             }
+
+            setInterval(function() {
+                socket.send(JSON.stringify({
+                    A : 'PING'
+                }))
+            }, 20000)
         }
 
         function sendMsg() {

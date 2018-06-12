@@ -10,6 +10,9 @@ const sockets = {};
 const actions = {
     CREATE : (data) => {
         return chain.add(data);
+    },
+    PING : (data) => {
+        return Promise.resolve('pong');
     }
 }
 
@@ -22,11 +25,15 @@ const initMessageHandler = (ws) => {
         msg = parseMessage(msg);
         actions[msg.A] && actions[msg.A](msg.D)
         .then((block) => {
+
+            if(msg.A === 'PING') return ws.send(JSON.stringify({ M : 'PONG' }));
+
             Object.values(sockets).forEach((socket) => { 
                 if (socket.readyState === 1) {
                     socket.send(JSON.stringify(chain.getLatest()))
                 }
             })
+
         })
         .catch((err) => {
             console.log(err);
