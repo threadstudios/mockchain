@@ -1,8 +1,8 @@
 const CryptoJS = require("crypto-js");
 const Block = require('./Block');
 
-const getGenesisBlock = () => {
-    return new Block(0, "0", Date.now() / 1000, "BG Genesis block", "816534932c2b7154836da6afc367695e6337db8a921823784c14378abed4f7d7");
+const getGenesisBlock = (id) => {
+    return new Block(0, "0", Date.now() / 1000, "BG Genesis block", CryptoJS.SHA256(Math.random() + id));
 };
 
 var calculateHashForBlock = (block) => {
@@ -14,8 +14,8 @@ var calculateHash = (index, previousHash, timestamp, data) => {
 };
 
 class BlockChain {
-    constructor() {
-        this.chain = [getGenesisBlock()]
+    constructor(id) {
+        this.chain = [getGenesisBlock(id)]
     }
     getLatest() {
         return this.chain[this.chain.length - 1];
@@ -26,6 +26,15 @@ class BlockChain {
         const ts = new Date().getTime() / 1000;
         const nextHash = calculateHash(nextIndex, previous.hash, ts, data);
         return new Block(nextIndex, previous.hash, ts, data, nextHash);
+    }
+    getHash(hash) {
+        let data = false;
+        this.chain.forEach((block, at) => {
+            if(block.hash === hash) {
+                data = { block, at };
+            }
+        });
+        return data;
     }
     _canAdd(next, prev) {
         return new Promise((resolve, reject) => {
@@ -51,4 +60,4 @@ class BlockChain {
     }
 }
 
-module.exports = new BlockChain();
+module.exports = BlockChain;
