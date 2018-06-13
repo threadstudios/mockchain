@@ -8,16 +8,20 @@ class StateChain {
         this.state = new State(initialState);
     }
     add(data, prevHash) {
-        if (this.currentHash === false || prevHash === this.currentHash) {
-            this.state.setState(data);
-            return this.chain.add(data);
-        } else {
-            /*
-             if hash exists on this chain lets figure out what we have missed
-             else treat it as a duff request.
-             */
-            return Promise.reject({ ...this.chain.getHash(prevHash), ...this.getFresh() })
-        }
+        return new Promise((resolve, reject) => {
+            if (!this.chain.getLatest() || prevHash === this.chain.getLatest().hash) {
+                this.state.setState(data);
+                this.chain.add(data).then((block) => {
+                    resolve(block);
+                });
+            } else {
+                /*
+                 if hash exists on this chain lets figure out what we have missed
+                 else treat it as a duff request.
+                 */
+                return reject({ ...this.chain.getHash(prevHash), ...this.getFresh() })
+            }
+        })
     }
     getFresh() {
         return {

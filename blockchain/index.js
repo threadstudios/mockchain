@@ -52,9 +52,9 @@ class BlockChain {
     add(data) {
         return new Promise((resolve, reject) => {
             const block = this._createBlock(data);
-            this._canAdd(block, this.getLatest())
+            return this._canAdd(block, this.getLatest())
             .then(block => this.chain.push(block))
-            .then(block => resolve(block))
+            .then(blockRes => resolve(block))
             .catch(err => reject(err))
         });
     }
